@@ -1,10 +1,9 @@
 {
-	"name": "run-applescript",
+	"name": "spawn-applescript",
 	"version": "7.0.0",
 	"description": "Run AppleScript and get the result",
 	"license": "MIT",
-	"repository": "sindresorhus/run-applescript",
-	"funding": "https://github.com/sponsors/sindresorhus",
+	"repository": "evannagle/spawn-applescript",
 	"author": {
 		"name": "Sindre Sorhus",
 		"email": "sindresorhus@gmail.com",

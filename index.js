@@ -1,31 +1,55 @@
 import process from 'node:process';
-import {promisify} from 'node:util';
-import {execFile, execFileSync} from 'node:child_process';
+import { spawn } from 'node:child_process';
 
-const execFileAsync = promisify(execFile);
-
-export async function runAppleScript(script, {humanReadableOutput = true} = {}) {
+export async function runAppleScript(script, { humanReadableOutput = true } = {}) {
 	if (process.platform !== 'darwin') {
 		throw new Error('macOS only');
 	}
 
 	const outputArguments = humanReadableOutput ? [] : ['-ss'];
+	const child = spawn('osascript', ['-e', script, ...outputArguments]);
 
-	const {stdout} = await execFileAsync('osascript', ['-e', script, outputArguments]);
-	return stdout.trim();
+	return new Promise((resolve, reject) => {
+		let stdout = '';
+		child.stdout.on('data', (data) => {
+			stdout += data.toString();
+		});
+
+		child.on('error', (err) => reject(err));
+
+		child.on('close', (code) => {
+			if (code !== 0) {
+				reject(new Error(`AppleScript exited with code ${code}`));
+			} else {
+				resolve(stdout.trim());
+			}
+		});
+	});
 }
 
-export function runAppleScriptSync(script, {humanReadableOutput = true} = {}) {
+export function runAppleScriptSync(script, { humanReadableOutput = true } = {}) {
 	if (process.platform !== 'darwin') {
 		throw new Error('macOS only');
 	}
 
 	const outputArguments = humanReadableOutput ? [] : ['-ss'];
+	const child = spawn('osascript', ['-e', script, ...outputArguments], {
+		stdio: ['ignore', 'pipe', 'ignore'] // Assuming stderr is not important
+	});
 
-	const stdout = execFileSync('osascript', ['-e', script, ...outputArguments], {
-		encoding: 'utf8',
-		stdio: ['ignore', 'pipe', 'ignore'],
-		timeout: 500,
+	let stdout = '';
+	child.stdout.on('data', (data) => {
+		stdout += data.toString();
+	});
+
+	child.on('error', (err) => {
+		throw err; // Rethrow the error
+	});
+
+	child.on('close', (code) => {
+		if (code !== 0) {
+			throw new Error(`AppleScript exited with code ${code}`);
+		}
 	});
 
 	return stdout.trim();
