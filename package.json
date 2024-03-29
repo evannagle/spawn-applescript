@@ -5,9 +5,9 @@
 	"license": "MIT",
 	"repository": "evannagle/spawn-applescript",
 	"author": {
-		"name": "Sindre Sorhus",
-		"email": "sindresorhus@gmail.com",
-		"url": "https://sindresorhus.com"
+		"name": "Evan Nagle",
+		"email": "evan.nagle@gmail.com",
+		"url": "https://www.anecdotaldiet.com"
 	},
 	"type": "module",
 	"exports": {
@@ -19,7 +19,8 @@
 		"node": ">=18"
 	},
 	"scripts": {
-		"test": "xo && ava && tsd"
+		"test": "xo --fix && ava && tsd",
+		"lint": "npx xo --fix"
 	},
 	"files": [
 		"index.js",
